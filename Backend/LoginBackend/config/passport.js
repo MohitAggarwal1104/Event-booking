@@ -28,11 +28,14 @@ passport.use(
         let user = await User.findOne({ email });
 
         if (!user) {
+
           user = await User.create({
             name,
             email,
-            provider: "google"
+            provider: "google",
+            isVerified: true
           });
+
         }
 
         done(null, user);
