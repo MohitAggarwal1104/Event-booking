@@ -8,10 +8,13 @@ export const sendEmail = async (
 
   try {
 
-    console.log("EMAIL USER:", process.env.EMAIL_USER);
-
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+
+      host: "smtp.gmail.com",
+
+      port: 465,
+
+      secure: true,
 
       auth: {
         user: process.env.EMAIL_USER,
@@ -21,14 +24,21 @@ export const sendEmail = async (
 
     console.log("TRANSPORT CREATED");
 
+    // VERIFY SMTP
+    await transporter.verify();
+
+    console.log("SMTP VERIFIED");
+
     const info = await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `"EventBook" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       text
     });
 
-    console.log("EMAIL SENT:", info.response);
+    console.log("EMAIL SENT:", info.messageId);
+
+    return info;
 
   } catch (err) {
 
