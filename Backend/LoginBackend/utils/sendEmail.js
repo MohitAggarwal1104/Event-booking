@@ -21,6 +21,10 @@ export const sendEmail = async (
       auth: {
         user: process.env.BREVO_EMAIL,
         pass: process.env.BREVO_SMTP_KEY
+      },
+
+      tls: {
+        rejectUnauthorized: false
       }
 
     });
@@ -29,7 +33,7 @@ export const sendEmail = async (
 
     const info = await transporter.sendMail({
 
-      from: process.env.BREVO_EMAIL,
+      from: `"EVENT-MANAGEMENT" <${process.env.BREVO_EMAIL}>`,
 
       to,
 
@@ -39,7 +43,7 @@ export const sendEmail = async (
 
     });
 
-    console.log("EMAIL SENT");
+    console.log("EMAIL SENT SUCCESS");
     console.log(info);
 
     return info;
