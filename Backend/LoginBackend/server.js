@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-dotenv.config(); // ✅ FIRST LINE
+dotenv.config();
 
 import express from "express";
 import cors from "cors";
@@ -9,37 +9,57 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import passport from "./config/passport.js";
 
-const app = express(); // ✅ create app BEFORE using it
+const app = express();
 
-// DB
+// ================= DATABASE =================
+
 connectDB();
 
-// Middlewares
-app.use(cors());
+// ================= MIDDLEWARES =================
+
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://event-booking-indol-ten.vercel.app"
+  ],
+  credentials: true
+}));
+
 app.use(express.json());
 
-// Session (required for passport)
+// ================= SESSION =================
+
 app.use(
   session({
-    secret: "secret",
+    secret: process.env.SESSION_SECRET || "secret",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    cookie: {
+      secure: true,
+      sameSite: "none"
+    }
   })
 );
 
-// Passport
+// ================= PASSPORT =================
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Routes
+// ================= ROUTES =================
+
 app.use("/api/auth", authRoutes);
 
-// Test route
+// ================= TEST ROUTE =================
+
 app.get("/", (req, res) => {
   res.send("Auth Service Running 🚀");
 });
 
-// Start server
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
+// ================= START SERVER =================
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
