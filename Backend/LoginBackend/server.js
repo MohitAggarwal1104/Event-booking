@@ -4,6 +4,7 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import session from "express-session";
+import MongoStore from "connect-mongo";
 
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -32,8 +33,15 @@ app.use(express.json());
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "secret",
+
     resave: false,
+
     saveUninitialized: false,
+
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI
+    }),
+
     cookie: {
       secure: true,
       sameSite: "none"
