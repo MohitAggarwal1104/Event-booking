@@ -8,6 +8,8 @@ export const sendEmail = async (
 
   try {
 
+    console.log("EMAIL START");
+
     const transporter = nodemailer.createTransport({
 
       host: "smtp-relay.brevo.com",
@@ -19,11 +21,7 @@ export const sendEmail = async (
       auth: {
         user: process.env.BREVO_EMAIL,
         pass: process.env.BREVO_SMTP_KEY
-      },
-
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000
+      }
 
     });
 
@@ -31,7 +29,7 @@ export const sendEmail = async (
 
     const info = await transporter.sendMail({
 
-      from: `"EVENT-MANAGEMENT" <ridewithme.hlep@gmail.com>`,
+      from: process.env.BREVO_EMAIL,
 
       to,
 
@@ -41,8 +39,7 @@ export const sendEmail = async (
 
     });
 
-    console.log("EMAIL SENT SUCCESS");
-
+    console.log("EMAIL SENT");
     console.log(info);
 
     return info;
@@ -50,7 +47,6 @@ export const sendEmail = async (
   } catch (err) {
 
     console.log("EMAIL ERROR");
-
     console.log(err);
 
     throw err;
