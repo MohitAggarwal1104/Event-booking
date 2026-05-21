@@ -70,13 +70,14 @@ export const signup = async (req, res) => {
 
   } catch (err) {
 
-    console.log(err);
+  console.log("SIGNUP ERROR:");
+  console.log(err);
 
-    return errorResponse(
-      res,
-      err.message || "Signup failed"
-    );
-  }
+  return res.status(500).json({
+    success: false,
+    message: err.message
+  });
+}
 };
 
 // ======================================
