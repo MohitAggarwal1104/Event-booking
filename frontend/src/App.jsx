@@ -1,12 +1,27 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import CreateEvent from "./pages/CreateEvent";
-// import Scanner from "./pages/Scanner";
 import Bookings from "./pages/Bookings";
 import Scanner from "./pages/Scanner";
 
 export default function App() {
+
+  useEffect(() => {
+
+    const script = document.createElement("script");
+
+    script.src =
+      "https://checkout.razorpay.com/v1/checkout.js";
+
+    script.async = true;
+
+    document.body.appendChild(script);
+
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>
