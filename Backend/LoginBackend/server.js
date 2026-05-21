@@ -12,19 +12,28 @@ import passport from "./config/passport.js";
 
 const app = express();
 
+// ================= TRUST PROXY =================
+
+app.set("trust proxy", 1);
+
 // ================= DATABASE =================
 
 connectDB();
 
-// ================= MIDDLEWARES =================
+// ================= CORS =================
 
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://event-booking-indol-ten.vercel.app"
-  ],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://event-booking-indol-ten.vercel.app"
+    ],
+
+    credentials: true
+  })
+);
+
+// ================= JSON =================
 
 app.use(express.json());
 
@@ -32,7 +41,7 @@ app.use(express.json());
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "secret",
+    secret: process.env.SESSION_SECRET || "eventbooksecret",
 
     resave: false,
 
@@ -43,8 +52,14 @@ app.use(
     }),
 
     cookie: {
-      secure: true,
-      sameSite: "none"
+      secure: process.env.NODE_ENV === "production",
+
+      sameSite:
+        process.env.NODE_ENV === "production"
+          ? "none"
+          : "lax",
+
+      maxAge: 1000 * 60 * 60 * 24 * 7
     }
   })
 );
@@ -52,6 +67,7 @@ app.use(
 // ================= PASSPORT =================
 
 app.use(passport.initialize());
+
 app.use(passport.session());
 
 // ================= ROUTES =================
