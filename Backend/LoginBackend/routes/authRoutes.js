@@ -1,5 +1,6 @@
 import express from "express";
 import passport from "passport";
+
 import {
   signup,
   login,
@@ -12,30 +13,61 @@ import { generateToken } from "../config/jwt.js";
 
 const router = express.Router();
 
-// ================= AUTH =================
+// ================= NORMAL AUTH =================
+
 router.post("/signup", signup);
-router.post("/login", login);
+
 router.post("/verify-email", verifyEmail);
+
+router.post("/login", login);
+
 router.post("/forgot-password", forgotPassword);
+
 router.post("/reset-password", resetPassword);
 
-// ================= GOOGLE AUTH =================
+// ================= GOOGLE LOGIN =================
 
-// STEP 1: Redirect to Google
+// START GOOGLE LOGIN
 router.get(
   "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+  passport.authenticate("google", {
+    scope: ["profile", "email"]
+  })
 );
 
-// STEP 2: Callback
+// GOOGLE CALLBACK
 router.get(
   "/google/callback",
-  passport.authenticate("google", { session: false }),
-  (req, res) => {
-    const token = generateToken(req.user);
 
-    // redirect to frontend with token
-    res.redirect(`http://localhost:5173/dashboard?token=${token}`);
+  passport.authenticate("google", {
+    failureRedirect:
+      process.env.NODE_ENV === "production"
+        ? "https://event-booking-indol-ten.vercel.app/login"
+        : "http://localhost:5173/login",
+    session: false
+  }),
+
+  async (req, res) => {
+    try {
+
+      const token = generateToken(req.user);
+
+      const redirectURL =
+        process.env.NODE_ENV === "production"
+          ? "https://event-booking-indol-ten.vercel.app"
+          : "http://localhost:5173";
+
+      res.redirect(
+        `${redirectURL}/dashboard?token=${token}`
+      );
+
+    } catch (err) {
+
+      res.status(500).json({
+        message: "Google login failed"
+      });
+
+    }
   }
 );
 
